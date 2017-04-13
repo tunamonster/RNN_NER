@@ -1,5 +1,5 @@
-results/
+results/**
 *.pyc
-tmp/
-__pycache__/
+tmp/**
+__pycache__/**
 
