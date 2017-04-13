@@ -50,7 +50,7 @@ class Config:
     def __init__(self, args):
         self.cell = args.cell
 
-        if args.model_path is not None:
+        if "model_path" in args:
             # Where to save things.
             self.output_path = args.model_path
         else:
