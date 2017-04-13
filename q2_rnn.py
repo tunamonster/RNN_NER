@@ -50,7 +50,7 @@ class Config:
     def __init__(self, args):
         self.cell = args.cell
 
-        if "model_path" in args:
+        if args.model_path is not None:
             # Where to save things.
             self.output_path = args.model_path
         else:
@@ -324,7 +324,6 @@ class RNNModel(NERModel):
             loss: A 0-d tensor (scalar)
         """
         ### YOUR CODE HERE (~2-4 lines)
-        # import code; code.interact(local=dict(globals(), **locals()))
         unmasked_loss = tf.nn.sparse_softmax_cross_entropy_with_logits(
                                 labels = self.labels_placeholder,
                                 logits = preds)
@@ -553,7 +552,7 @@ input> Germany 's representative to the European Union 's veterinary committee .
             while True:
                 # Create simple REPL
                 try:
-                    sentence = raw_input("input> ")
+                    sentence = input("input> ")
                     tokens = sentence.strip().split(" ")
                     for sentence, _, predictions in model.output(session, [(tokens, ["O"] * len(tokens))]):
                         predictions = [LBLS[l] for l in predictions]
