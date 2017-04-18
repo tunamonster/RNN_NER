@@ -278,23 +278,18 @@ class RNNModel(NERModel):
         # Define U and b2 as variables.
         # Initialize state as vector of zeros.
         ### YOUR CODE HERE (~4-6 lines)
-        with tf.variable_scope("RNN"):
-            state = tf.zeros(tf.shape(x_[0]), tf.float32)
-            xav = tf.contrib.layers.xavier_initializer(uniform=True, seed=None, dtype=tf.float32)
-            U = tf.get_variable("U", [Config.hidden_size, Config.n_classes], tf.float32, xav)
-            b2 = tf.get_variable("b2", [Config.n_classes], tf.float32, tf.zeros_initializer())
-
-            W_x = tf.get_variable("W_x", shape=[Config.n_features * Config.embed_size, Config.hidden_size], 
-                initializer=xav, dtype=np.float32)
-            W_h = tf.get_variable("W_h", shape=[Config.hidden_size, Config.hidden_size], 
-                initializer=xav, dtype=np.float32)
-            b = tf.get_variable("b", shape=[Config.hidden_size], 
-                initializer=tf.zeros_initializer(), dtype=np.float32)        
+        
+        state = tf.zeros(tf.shape(x_[0]), tf.float32)
+        xav = tf.contrib.layers.xavier_initializer(uniform=True, seed=None, dtype=tf.float32)
+        U = tf.get_variable("U", [Config.hidden_size, Config.n_classes], tf.float32, xav)
+        b2 = tf.get_variable("b2", [Config.n_classes], tf.float32, tf.zeros_initializer())      
         ### END YOUR CODE
 
-        with tf.variable_scope("RNN", reuse=True): 
+        with tf.variable_scope(self.config.cell): 
             for time_step in range(self.max_length): 
                 ### YOUR CODE HERE (~6-10 lines)
+                if time_step > 0:
+                    tf.get_variable_scope().reuse_variables()
                 o_t, state = cell(x_[time_step], state, scope=tf.get_variable_scope())
                 o_drop_t = tf.nn.dropout(o_t, self.dropout_placeholder)
                 y_t = tf.matmul(o_drop_t, U) + b2

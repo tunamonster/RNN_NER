@@ -65,7 +65,41 @@ class GRUCell(tf.contrib.rnn.BasicRNNCell):
         # be defined elsewhere!
         with tf.variable_scope(scope):
             ### YOUR CODE HERE (~20-30 lines)
-            pass
+            #import code; code.interact(local=dict(globals(), **locals()))
+            xav = tf.contrib.layers.xavier_initializer(uniform=True, seed=None, dtype=tf.float32)
+            U_shape = [self.input_size, self.state_size]
+            W_shape = [self.state_size, self.state_size]
+            b_shape = self.state_size
+
+            U_r = tf.get_variable("U_r", shape= U_shape, 
+                initializer=xav, dtype=np.float32)
+            W_r = tf.get_variable("W_r", shape = W_shape,
+                initializer=xav, dtype=np.float32)
+            b_r = tf.get_variable("b_r", shape = b_shape,
+                initializer=tf.zeros_initializer(), dtype=np.float32)
+            U_z = tf.get_variable("U_z", shape= U_shape, 
+                initializer=xav, dtype=np.float32)            
+            W_z = tf.get_variable("W_z", shape = W_shape,
+                initializer=xav, dtype=np.float32)            
+            b_z = tf.get_variable("b_z", shape = b_shape,
+                initializer=tf.zeros_initializer(), dtype=np.float32)
+            U_o = tf.get_variable("U_o", shape= U_shape, 
+                initializer=xav, dtype=np.float32)            
+            W_o = tf.get_variable("W_o", shape = W_shape,
+                initializer=xav, dtype=np.float32)   
+            b_o = tf.get_variable("b_o", shape = b_shape,
+                initializer=tf.zeros_initializer(), dtype=np.float32)
+
+            r_t = tf.sigmoid(tf.matmul(inputs, U_r) 
+                + tf.matmul(state, W_r) 
+                + b_r)
+            z_t = tf.sigmoid(tf.matmul(inputs, U_z) 
+                + tf.matmul(state, W_z)
+                + b_z)
+            o_t = tf.tanh(tf.matmul(inputs, U_o)
+                + tf.matmul(r_t * state, W_o)
+                + b_o)
+            new_state = z_t * state + (1 - z_t) * o_t
             ### END YOUR CODE ###
         # For a GRU, the output and state are the same (N.B. this isn't true
         # for an LSTM, though we aren't using one of those in our
@@ -111,7 +145,7 @@ def test_gru_cell():
                 y_, ht_ = session.run([y_var, ht_var], feed_dict={x_placeholder: x, h_placeholder: h})
                 print("y_ = " + str(y_))
                 print("ht_ = " + str(ht_))
-
+                #import code; code.interact(local=dict(globals(), **locals()))
                 assert np.allclose(y_, ht_), "output and state should be equal."
                 assert np.allclose(ht, ht_, atol=1e-2), "new state vector does not seem to be correct."
 
